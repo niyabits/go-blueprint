@@ -4,7 +4,9 @@ I intend to extend the Go blueprint to learn more about the standard http librar
 # Extensions
 
 - [ ] Log a message when the server is started
-- [ ] Create an API point that serves data from the database
+- [ ] Create a SQL file that can add data to database and source it
+- [ ] Create an API point that returns all data from a table
+- [ ] Create an API point that can be used to query for a single record in the database
 - [ ] Create an API point to `INSERT`s data in the database
 
 # Project go-blueprint
