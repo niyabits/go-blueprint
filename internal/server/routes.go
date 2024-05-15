@@ -2,12 +2,14 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
 
+	fmt.Printf("🚀 Server Started Successfuly on Port :%d\n", s.port)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.HelloWorldHandler)
 
