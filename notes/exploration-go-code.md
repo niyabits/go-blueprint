@@ -1,4 +1,4 @@
-# Exploration
+# Exploration of Code
 
 I start by exploring different files and the project structure.
 I am mostly writing about my thought process of exploring the project and syntax/technqiues that intrigue my interest.
