@@ -4,14 +4,31 @@ I intend to extend the Go blueprint to learn more about the standard http librar
 # Extensions
 
 - [x] Log a message when the server is started
-- [ ] Create a SQL file that can add data to database and source it
+- [x] Create a SQL file that can add data to database and source it
 - [ ] Create an API point that returns all data from a table
 - [ ] Create an API point that can be used to query for a single record in the database
 - [ ] Create an API point to `INSERT`s data in the database
 
-# Project go-blueprint
+## Connect Database with `psql`
 
-One Paragraph of project description goes here
+Since `psql` hostname defaults to local socket we need to explicitly pass in the hostname as 'localhost'.
+Passing the username as `melkey` will give root access. The password is in the `.env`
+
+These details are specified in `.env` and passed to `docker-compose.yml`
+
+```bash
+psql -h localhost blueprint melkey
+```
+
+## Execute `create-tables.sql` with `psql`
+
+`\i` is an internal `psql`command that can be used to execute SQL in files that are in the same filesystem as the client.
+
+> Aside: This is in contrast to SQL's [`COPY` command](https://www.postgresql.org/docs/16/sql-copy.html)
+
+```
+\i create-tables.sql
+```
 
 ## Getting Started
 
