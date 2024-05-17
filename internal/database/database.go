@@ -23,7 +23,13 @@ type Service interface {
 	// It returns an error if the connection cannot be closed.
 	Close() error
 
-	GetAllAlbums() []Album
+	AllAlbums() ([]Album, error)
+
+	AlbumById(id int) (Album, error)
+
+	AddAlbum(alb Album) (int64, error)
+
+	DeleteAlbumByID(id int) (int, error)
 }
 
 type Album struct {
@@ -113,13 +119,17 @@ func (s *service) Health() map[string]string {
 	return stats
 }
 
-func (s *service) GetAllAlbums() []Album {
+func (s *service) AllAlbums() ([]Album, error) {
 	// An albums slice to hold data from returned rows
 	var albums []Album
 
-	rows, err := s.db.Query("SELECT id, title, artist, price FROM album")
+	q := `
+		SELECT id, title, artist, price FROM album
+	`
+
+	rows, err := s.db.Query(q)
 	if err != nil {
-		log.Fatalf("allAlbums: %v", err)
+		return albums, fmt.Errorf("[AllAlbums] Error: %v", err)
 	}
 	defer rows.Close()
 
@@ -127,17 +137,70 @@ func (s *service) GetAllAlbums() []Album {
 		var alb Album
 
 		if err := rows.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
-			log.Fatalf("allAlbums: %v", err)
+			return albums, fmt.Errorf("[AllAlbums] Error: %v", err)
 		}
 
 		albums = append(albums, alb)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatalf("allAlbums: %v", err)
+		return albums, fmt.Errorf("[AllAlbums] Error: %v", err)
 	}
 
-	return albums
+	return albums, nil
+}
+
+func (s *service) AlbumById(id int) (Album, error) {
+	var alb Album
+
+	q := `
+		SELECT id, title, artist, price FROM album WHERE id = $1 
+	`
+	row := s.db.QueryRow(q, id)
+
+	if err := row.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
+		if err == sql.ErrNoRows {
+			// The error of no matching Album should be handled by caller of this method
+			return alb, err
+		}
+		return alb, fmt.Errorf("[AlbumById] Error: %v", err)
+	}
+
+	return alb, nil
+}
+
+func (s *service) AddAlbum(alb Album) (int64, error) {
+	var rowsEffected int64
+
+	q := `
+		INSERT INTO album (title, artist, price) 
+			VALUES ($1, $2, $3)
+	`
+
+	res, err := s.db.Exec(q, alb.Title, alb.Artist, alb.Price)
+	if err != nil {
+		return rowsEffected, fmt.Errorf("[AddAlbum] Error: %v", err)
+	}
+
+	rowsEffected, err = res.RowsAffected()
+	if err != nil {
+		return rowsEffected, fmt.Errorf("[AlbumById] Error: %v", err)
+	}
+
+	return rowsEffected, nil
+}
+
+func (s *service) DeleteAlbumByID(id int) (int, error) {
+	q := `
+		DELETE FROM album WHERE id = $1 
+	`
+
+	_, err := s.db.Exec(q, id)
+	if err != nil {
+		return id, fmt.Errorf("[DeleteAlbumByID] Error: %v", err)
+	}
+
+	return id, nil
 }
 
 // Close closes the database connection.

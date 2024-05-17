@@ -3,11 +3,14 @@ I intend to extend the Go blueprint to learn more about the standard http librar
 
 # Extensions
 
-- [x] Log a message when the server is started
-- [x] Create a SQL file that can add data to database and source it
-- [x] Create an API point that returns all data from a table
-- [ ] Create an API point that can be used to query for a single record in the database
-- [ ] Create an API point to `INSERT`s data in the database
+- [x] Log Message when the Server Starts
+- [x] SQL File to Create Tables
+- [x] GET: get all albums
+- [x] GET: get an album by ID
+- [x] POST: add an album
+- [x] DELETE: delete an album
+- [ ] Gracefully Handle server errors by sending appropriate responses
+- [ ] Add tests for all the new endpoints
 
 ## Connect Database with `psql`
 
