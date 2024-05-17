@@ -22,6 +22,15 @@ type Service interface {
 	// Close terminates the database connection.
 	// It returns an error if the connection cannot be closed.
 	Close() error
+
+	GetAllAlbums() []Album
+}
+
+type Album struct {
+	ID     int
+	Title  string
+	Artist string
+	Price  float32
 }
 
 type service struct {
@@ -102,6 +111,33 @@ func (s *service) Health() map[string]string {
 	}
 
 	return stats
+}
+
+func (s *service) GetAllAlbums() []Album {
+	// An albums slice to hold data from returned rows
+	var albums []Album
+
+	rows, err := s.db.Query("SELECT id, title, artist, price FROM album")
+	if err != nil {
+		log.Fatalf("allAlbums: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var alb Album
+
+		if err := rows.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
+			log.Fatalf("allAlbums: %v", err)
+		}
+
+		albums = append(albums, alb)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Fatalf("allAlbums: %v", err)
+	}
+
+	return albums
 }
 
 // Close closes the database connection.
