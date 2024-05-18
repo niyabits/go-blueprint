@@ -21,19 +21,19 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// The URL Patterns without a trailing slash have been explicitly specified because
 	// ServeMux returns a 301 Redirect if paths without trailing slashes are not specified.
 	// See: https://pkg.go.dev/net/http#hdr-Trailing_slash_redirection
-	mux.HandleFunc("GET /health/", s.healthHandler)
+	mux.HandleFunc("GET /health/{$}", s.healthHandler)
 	mux.HandleFunc("GET /health", s.healthHandler)
 
-	mux.HandleFunc("GET /albums/", s.getAllAlbums)
+	mux.HandleFunc("GET /albums/{$}", s.getAllAlbums)
 	mux.HandleFunc("GET /albums", s.getAllAlbums)
 
-	mux.HandleFunc("GET /albums/{id}/", s.getAlbumByID)
+	mux.HandleFunc("GET /albums/{id}/{$}", s.getAlbumByID)
 	mux.HandleFunc("GET /albums/{id}", s.getAlbumByID)
 
-	mux.HandleFunc("POST /albums/", s.postAlbum)
+	mux.HandleFunc("POST /albums/{$}", s.postAlbum)
 	mux.HandleFunc("POST /albums", s.postAlbum)
 
-	mux.HandleFunc("DELETE /albums/{id}/", s.deleteAlbum)
+	mux.HandleFunc("DELETE /albums/{id}/{$}", s.deleteAlbum)
 	mux.HandleFunc("DELETE /albums/{id}", s.deleteAlbum)
 
 	return mux
