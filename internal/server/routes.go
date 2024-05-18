@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -48,7 +49,7 @@ func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[HelloWorldHandler] Error handling JSON marshal. Err: %v\n", err)
 	}
 
-	_, _ = w.Write(jsonResp)
+	_, _ = w.Write(append(jsonResp, '\n'))
 }
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +58,7 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[healthHandler] Error handling JSON marshal. Err: %v\n", err)
 	}
 
-	_, _ = w.Write(jsonResp)
+	_, _ = w.Write(append(jsonResp, '\n'))
 }
 
 func (s *Server) getAllAlbums(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +75,7 @@ func (s *Server) getAllAlbums(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
@@ -89,11 +90,11 @@ func (s *Server) getAllAlbums(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
-	_, _ = w.Write(jsonResp)
+	_, _ = w.Write(append(jsonResp, '\n'))
 }
 
 func (s *Server) getAlbumByID(w http.ResponseWriter, r *http.Request) {
@@ -112,7 +113,7 @@ func (s *Server) getAlbumByID(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
@@ -132,7 +133,7 @@ func (s *Server) getAlbumByID(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
@@ -140,18 +141,18 @@ func (s *Server) getAlbumByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("[getAlbumByID] Error: %v\n", err)
 
-		resp["error"] = "Could not return the album."
+		resp["error"] = "Could not return the album"
 		jsonResp, err := json.Marshal(resp)
 		if err != nil {
 			log.Printf("Could not parse reponse, Error: %v", err)
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
-	_, _ = w.Write(jsonResp)
+	_, _ = w.Write(append(jsonResp, '\n'))
 }
 
 func (s *Server) postAlbum(w http.ResponseWriter, r *http.Request) {
@@ -175,7 +176,7 @@ func (s *Server) postAlbum(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
@@ -191,7 +192,7 @@ func (s *Server) postAlbum(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
@@ -205,7 +206,7 @@ func (s *Server) postAlbum(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
@@ -218,7 +219,7 @@ func (s *Server) postAlbum(w http.ResponseWriter, r *http.Request) {
 	// Set the Header to HTTP Status Created 201
 	w.WriteHeader(http.StatusCreated)
 
-	_, _ = w.Write(jsonResp)
+	_, _ = w.Write(append(jsonResp, '\n'))
 }
 
 func (s *Server) deleteAlbum(w http.ResponseWriter, r *http.Request) {
@@ -237,7 +238,7 @@ func (s *Server) deleteAlbum(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
@@ -253,7 +254,7 @@ func (s *Server) deleteAlbum(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write(jsonResp)
+		_, _ = w.Write(append(jsonResp, '\n'))
 		return
 	}
 
@@ -264,5 +265,5 @@ func (s *Server) deleteAlbum(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[deleteAlbum] Error: %v\n", err)
 	}
 
-	_, _ = w.Write(jsonResp)
+	_, _ = w.Write(append(jsonResp, '\n'))
 }
