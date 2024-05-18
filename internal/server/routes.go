@@ -17,7 +17,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	fmt.Printf("🚀 Server Running Successfuly on Port: %d\n", s.port)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", s.notFoundHandler)
+
+	mux.HandleFunc("/", s.NotFoundHandler)
 
 	mux.HandleFunc("/{$}", s.HelloWorldHandler)
 
@@ -54,7 +55,7 @@ func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(append(jsonResp, '\n'))
 }
 
-func (s *Server) notFoundHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]string)
 	resp["message"] = "404 Not Found"
 
