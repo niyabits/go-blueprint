@@ -10,7 +10,6 @@ I intend to extend the Go blueprint to learn more about the standard http librar
 - [x] POST: add an album
 - [x] DELETE: delete an album
 - [x] Gracefully Handle server errors by sending appropriate responses
-- [ ] Add tests for all the new endpoints
 
 ## Connect Database with `psql`
 
