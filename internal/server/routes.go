@@ -120,7 +120,12 @@ func (s *Server) getAlbumByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("[getAlbumByID] Error: %v\n", err)
 
-		resp["error"] = "Could not get the album."
+		resp["error"] = "Could not get the album"
+
+		if err == sql.ErrNoRows {
+			resp["error"] = "Album ID not found"
+		}
+
 		jsonResp, err := json.Marshal(resp)
 		if err != nil {
 			log.Printf("Could not parse reponse, Error: %v", err)
