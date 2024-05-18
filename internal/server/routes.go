@@ -17,7 +17,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 	fmt.Printf("🚀 Server Running Successfuly on Port: %d\n", s.port)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", s.HelloWorldHandler)
+	mux.HandleFunc("/", s.notFoundHandler)
+
+	mux.HandleFunc("/{$}", s.HelloWorldHandler)
 
 	// The URL Patterns without a trailing slash have been explicitly specified because
 	// ServeMux returns a 301 Redirect if paths without trailing slashes are not specified.
@@ -49,6 +51,19 @@ func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[HelloWorldHandler] Error handling JSON marshal. Err: %v\n", err)
 	}
 
+	_, _ = w.Write(append(jsonResp, '\n'))
+}
+
+func (s *Server) notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	resp := make(map[string]string)
+	resp["message"] = "404 Not Found"
+
+	jsonResp, err := json.Marshal(resp)
+	if err != nil {
+		log.Printf("[notFoundHandler] Error handling JSON marshal. Err: %v\n", err)
+	}
+
+	w.WriteHeader(http.StatusNotFound)
 	_, _ = w.Write(append(jsonResp, '\n'))
 }
 
