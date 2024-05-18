@@ -68,7 +68,10 @@ func (s *Server) getAllAlbums(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[getAllAlbums] Error: %v\n", err)
 
 		resp["error"] = "Could not get Albums"
-		jsonResp, _ := json.Marshal(resp)
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
 
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write(jsonResp)
@@ -80,7 +83,10 @@ func (s *Server) getAllAlbums(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[getAllAlbums] Error: %v\n", err)
 
 		resp["error"] = "Could not return Albums"
-		jsonResp, _ := json.Marshal(resp)
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
 
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write(jsonResp)
@@ -91,27 +97,61 @@ func (s *Server) getAllAlbums(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) getAlbumByID(w http.ResponseWriter, r *http.Request) {
+	resp := make(map[string]string)
+
 	idFromURLPath := r.PathValue("id")
 
 	id, err := strconv.Atoi(idFromURLPath)
 	if err != nil {
-		log.Printf("[getAlbumByID] Invalid ID format: %v, Error: %v\n", id, err)
+		log.Printf("[getAlbumByID] Invalid ID format: %v, Error: %v\n", idFromURLPath, err)
+
+		resp["error"] = fmt.Sprintf("Invalid ID Format: %v", idFromURLPath)
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write(jsonResp)
+		return
 	}
 
 	alb, err := s.db.AlbumById(id)
 	if err != nil {
 		log.Printf("[getAlbumByID] Error: %v\n", err)
+
+		resp["error"] = "Could not get the album."
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write(jsonResp)
+		return
 	}
 
 	jsonResp, err := json.Marshal(alb)
 	if err != nil {
 		log.Printf("[getAlbumByID] Error: %v\n", err)
+
+		resp["error"] = "Could not return the album."
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write(jsonResp)
+		return
 	}
 
 	_, _ = w.Write(jsonResp)
 }
 
 func (s *Server) postAlbum(w http.ResponseWriter, r *http.Request) {
+	resp := make(map[string]string)
+
 	var alb database.Album
 
 	requestBody, err := io.ReadAll(r.Body)
@@ -122,24 +162,52 @@ func (s *Server) postAlbum(w http.ResponseWriter, r *http.Request) {
 	// Parse the request body's string to Album struct
 	if err := json.Unmarshal(requestBody, &alb); err != nil {
 		log.Printf("[postAlbum] Error: %v\n", err)
+
+		resp["error"] = "Could not parse the Album data"
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write(jsonResp)
+		return
 	}
 
 	// Add the Album to Database
 	rowsEffected, err := s.db.AddAlbum(alb)
 	if err != nil {
 		log.Printf("[postAlbum] Error: %v\n", err)
+
+		resp["error"] = "Could not add Album to the Database"
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write(jsonResp)
+		return
 	}
 
 	if rowsEffected < 1 {
 		log.Printf("[postAlbum]: Could not add Album")
+
+		resp["error"] = "Could not add Album to the Database"
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write(jsonResp)
+		return
 	}
 
-	resp := make(map[string]string)
 	resp["message"] = "Successfuly Added Album"
-
 	jsonResp, err := json.Marshal(resp)
 	if err != nil {
-		log.Printf("[postAlbum] Error: %v\n", err)
+		log.Printf("Could not parse reponse, Error: %v", err)
 	}
 
 	// Set the Header to HTTP Status Created 201
@@ -149,20 +217,41 @@ func (s *Server) postAlbum(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) deleteAlbum(w http.ResponseWriter, r *http.Request) {
+	resp := make(map[string]string)
+
 	idFromURLPath := r.PathValue("id")
 
 	id, err := strconv.Atoi(idFromURLPath)
 	if err != nil {
 		log.Printf("[deleteAlbum] Invalid Format of ID %v Error: %v\n", idFromURLPath, err)
+
+		resp["error"] = fmt.Sprintf("Invalid format of ID %v", idFromURLPath)
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write(jsonResp)
+		return
 	}
 
 	// Delete the Album from Database
 	albIndex, err := s.db.DeleteAlbumByID(id)
 	if err != nil {
 		log.Printf("[deleteAlbum] Error: %v\n", err)
+
+		resp["error"] = "Could not delete album from database"
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Could not parse reponse, Error: %v", err)
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write(jsonResp)
+		return
 	}
 
-	resp := make(map[string]string)
 	resp["message"] = fmt.Sprintf("Successfuly Added Album %v", albIndex)
 
 	jsonResp, err := json.Marshal(resp)
